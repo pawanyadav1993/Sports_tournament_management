@@ -1,0 +1,171 @@
+DROP DATABASE IF EXISTS `Steps`;
+CREATE DATABASE IF NOT EXISTS `Steps`;
+USE `Steps`;
+
+CREATE TABLE Administrator (
+ AdminID INT NOT NULL AUTO_INCREMENT,
+ AdminName VARCHAR(30),
+ AdminPhone VARCHAR(15),
+ PRIMARY KEY (AdminID)
+);
+
+CREATE TABLE Guest (
+ GuestID INT NOT NULL AUTO_INCREMENT, 
+ GuestEmail VARCHAR(30),
+ PRIMARY KEY (GuestID)
+);
+
+#ALTER TABLE Guest ADD CONSTRAINT PK_Guest PRIMARY KEY (GuestID);
+
+CREATE TABLE Player (
+ PlayerID INT NOT NULL AUTO_INCREMENT,
+ PlayerName VARCHAR(30),
+ PlayerPhone VARCHAR(15),
+ TeamID INT default NULL,
+  PRIMARY KEY (PlayerID)
+);
+
+#ALTER TABLE Player ADD CONSTRAINT PK_Player PRIMARY KEY (PlayerID);
+
+CREATE TABLE Sport (
+ SportID INT NOT NULL AUTO_INCREMENT,
+ SportName VARCHAR(30),
+ MinTeams INT,
+ MaxTeams INT,
+ DivisionTeams INT,
+ MaxTeamSize INT,
+ MinTeamSize INT,
+ GameRules VARCHAR(100),
+ IndoorOutdoor VARCHAR(50),
+  PRIMARY KEY (SportID)
+);
+
+#ALTER TABLE Sport ADD CONSTRAINT PK_Sport PRIMARY KEY (SportID);
+
+CREATE TABLE Tournament (
+ TournamentID INT NOT NULL AUTO_INCREMENT,
+ TName VARCHAR(30),
+ BeginDate DATE,
+ EndDate DATE,
+ Address VARCHAR(50),
+ AdminID INT NOT NULL,
+ SportID INT NOT NULL,
+  PRIMARY KEY (TournamentID)
+);
+
+#ALTER TABLE Tournament ADD CONSTRAINT PK_Tournament PRIMARY KEY (TournamentID);
+
+#DROP TABLE IF EXISTS `Division`;
+CREATE TABLE Division (
+ DivisionID INT NOT NULL AUTO_INCREMENT,
+ DivisionName VARCHAR(30),
+ IndoorOutdoor VARCHAR(50),
+ TeamMax INT,
+ PlayerMax INT,
+ WinningTeam INT,
+ SeasonEndDate DATE,
+ SportID INT NOT NULL,
+  PRIMARY KEY (DivisionID)
+);
+
+#ALTER TABLE Division ADD CONSTRAINT PK_Division PRIMARY KEY (DivisionID);
+
+CREATE TABLE Team (
+ TeamID INT NOT NULL AUTO_INCREMENT,
+ TeamName VARCHAR(30),
+ PlayerCount INT,
+ Active CHAR(10),
+ Rank INT,
+ Won INT,
+ Lost INT,
+ DivisionID INT default NULL,
+  PRIMARY KEY (TeamID)
+);
+
+#ALTER TABLE Team ADD CONSTRAINT PK_Team PRIMARY KEY (TeamID);
+
+CREATE TABLE TournamentBracket (
+ TournamentID INT NOT NULL,
+ RoundID INT NOT NULL,
+ GameID INT NOT NULL,
+ Venue VARCHAR(50),
+ GameDate DATE,
+ PlayoffGameWinner VARCHAR(30),
+ Address VARCHAR(50),
+ WinnerTeam1 INT default NULL,
+ WinnerTeam2 INT default NULL
+);
+
+ALTER TABLE TournamentBracket ADD CONSTRAINT PK_TournamentBracket PRIMARY KEY (TournamentID,RoundID,GameID);
+
+CREATE TABLE Coach (
+ CoachID INT NOT NULL AUTO_INCREMENT,
+ CoachName VARCHAR(30),
+ CoachPhone VARCHAR(15),
+ TeamID INT default NULL,
+  PRIMARY KEY (CoachID)
+);
+
+#ALTER TABLE Coach ADD CONSTRAINT PK_Coach PRIMARY KEY (CoachID);
+
+CREATE TABLE Games (
+ GameID INT NOT NULL,
+ Team1 INT,
+ Team2 INT,
+ Venue VARCHAR(50),
+ Date DATE,
+ Team1Score INT,
+ Team2Score INT,
+ Winner VARCHAR(30),
+ TeamID INT default NULL
+);
+
+ALTER TABLE Games ADD CONSTRAINT PK_Games PRIMARY KEY (GameID);
+
+CREATE TABLE User (
+ UserID INT NOT NULL AUTO_INCREMENT,
+ Name VARCHAR(20),
+ Password VARCHAR(50),
+ Email VARCHAR(30),
+ Address VARCHAR(50),
+ Priveleges INT,
+ AdminID INT default NULL,
+ GuestID INT default NULL,
+ CoachID INT default NULL,
+ PlayerID INT default NULL,
+ PRIMARY KEY (UserID)
+);
+
+#ALTER TABLE User ADD CONSTRAINT PK_User PRIMARY KEY (UserID);
+
+
+ALTER TABLE Tournament ADD CONSTRAINT FK_Tournament_0 FOREIGN KEY (AdminID) REFERENCES Administrator (AdminID);
+ALTER TABLE Tournament ADD CONSTRAINT FK_Tournament_1 FOREIGN KEY (SportID) REFERENCES Sport (SportID);
+
+
+ALTER TABLE Division ADD CONSTRAINT FK_Division_0 FOREIGN KEY (SportID) REFERENCES Sport (SportID);
+
+
+ALTER TABLE Team ADD CONSTRAINT FK_Team_0 FOREIGN KEY (DivisionID) REFERENCES Division (DivisionID);
+
+
+ALTER TABLE TournamentBracket ADD CONSTRAINT FK_TournamentBracket_0 FOREIGN KEY (TournamentID) REFERENCES Tournament (TournamentID);
+ALTER TABLE TournamentBracket ADD CONSTRAINT FK_TournamentBracket_1 FOREIGN KEY (WinnerTeam1) REFERENCES Division (DivisionID);
+ALTER TABLE TournamentBracket ADD CONSTRAINT FK_TournamentBracket_2 FOREIGN KEY (WinnerTeam2) REFERENCES Division (DivisionID);
+
+
+ALTER TABLE Coach ADD CONSTRAINT FK_Coach_0 FOREIGN KEY (TeamID) REFERENCES Team (TeamID);
+
+
+ALTER TABLE Games ADD CONSTRAINT FK_Games_0 FOREIGN KEY (TeamID) REFERENCES Team (TeamID);
+
+
+ALTER TABLE Player ADD CONSTRAINT FK_Player_0 FOREIGN KEY (TeamID) REFERENCES Team (TeamID);
+
+
+ALTER TABLE User ADD CONSTRAINT FK_User_0 FOREIGN KEY (AdminID) REFERENCES Administrator (AdminID);
+ALTER TABLE User ADD CONSTRAINT FK_User_1 FOREIGN KEY (GuestID) REFERENCES Guest (GuestID);
+ALTER TABLE User ADD CONSTRAINT FK_User_2 FOREIGN KEY (CoachID) REFERENCES Coach (CoachID);
+ALTER TABLE User ADD CONSTRAINT FK_User_3 FOREIGN KEY (PlayerID) REFERENCES Player (PlayerID);
+
+
